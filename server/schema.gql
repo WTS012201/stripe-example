@@ -8,6 +8,7 @@ type User {
   email: String!
   created_at: DateTime!
   updated_at: DateTime!
+  type: String!
 }
 
 """
@@ -37,6 +38,7 @@ type Mutation {
   createUser(credentials: Credentials!): UserResponse!
   login(credentials: LoginCredentials!): User!
   logout: Boolean!
+  createSubscription(source: String!): UserResponse!
 }
 
 input Credentials {

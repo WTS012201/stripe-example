@@ -1,0 +1,5 @@
+Cache exchange will check the cached data from previous user request and
+check if a graphql hook should be triggered or not based off of the data.
+This is to limit the number of network requests
+
+Refreshing will invalidate the cache

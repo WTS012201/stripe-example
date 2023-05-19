@@ -6,11 +6,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "./modules/user/user.module";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { AuthModule } from "./modules/user/auth/auth.module";
+import { __prod__ } from "./constants";
+import { PaymentModule } from "./modules/payment/payment.module";
 
-// cors: {
-//   origin: "http://localhost:4000",
-//   credentials: true,
-// },
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -20,16 +18,13 @@ import { AuthModule } from "./modules/user/auth/auth.module";
     }),
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "localhost",
-      port: 5432,
-      username: "postgres",
-      password: "",
-      database: "gql-nest",
+      url: process.env.DATABASE_URL,
       entities: ["dist/**/*.model.js"],
-      synchronize: true,
+      synchronize: !__prod__,
     }),
     UserModule,
     AuthModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

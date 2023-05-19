@@ -12,11 +12,15 @@ import { Inject, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Credentials, LoginCredentials, UserResponse } from "./user.dto";
 import { GqlAuthGuard, LocalAuthGuard, UserAuthGuard } from "./auth/auth.guard";
-import { Ctx } from "src/constants";
+import { Ctx, SESSION_COOKIE } from "src/constants";
+import { PaymentService } from "../payment/payment.service";
 
 @Resolver(User)
 export class UserResolver {
-  constructor(@Inject(UserService) private userService: UserService) {}
+  constructor(
+    @Inject(UserService) private userService: UserService,
+    @Inject(PaymentService) private paymentService: PaymentService
+  ) {}
 
   @Mutation(() => UserResponse)
   async createUser(
@@ -39,12 +43,13 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   @UseGuards(UserAuthGuard)
-  me(@Context() { req }: Ctx): Promise<User> {
+  me(@Context() { req }: Ctx): User {
     if (!req.user.id) {
       return null;
     }
 
-    return this.userService.findUserById(req.user.id);
+    console.log("id", req.user.id);
+    return req.user;
   }
 
   @ResolveField(() => String, { nullable: true })
@@ -58,7 +63,7 @@ export class UserResolver {
   logout(@Context() { req, res }: Ctx): Promise<any> {
     return new Promise((resolve) =>
       req.session.destroy((err) => {
-        res.clearCookie("name");
+        res.clearCookie(SESSION_COOKIE);
         if (err) {
           console.log(err);
           resolve(false);
@@ -67,5 +72,19 @@ export class UserResolver {
         resolve(true);
       })
     );
+  }
+
+  @Mutation(() => UserResponse)
+  @UseGuards(UserAuthGuard)
+  async createSubscription(
+    @Args("source", { type: () => String }) source: string,
+    @Context() { req }: Ctx
+  ): Promise<UserResponse> {
+    const res = await this.paymentService.createSubscription({
+      user: req.user,
+      source,
+    });
+
+    return res;
   }
 }

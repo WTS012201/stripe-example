@@ -1,3 +1,5 @@
+import "dotenv-safe/config";
+
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import * as passport from "passport";
@@ -5,11 +7,12 @@ import * as session from "express-session";
 const RedisStore = require("connect-redis").default;
 import { createClient } from "redis";
 import { Logger } from "@nestjs/common";
+import { SESSION_COOKIE, __prod__ } from "./constants";
 
 const main = async () => {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     },
   });
@@ -25,16 +28,16 @@ const main = async () => {
 
   app.use(
     session({
-      name: "name",
+      name: SESSION_COOKIE,
       store: new RedisStore({ client: redisClient }),
-      secret: "secret",
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
       cookie: {
-        httpOnly: true,
+        httpOnly: !__prod__,
         sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
-        // secure: true,
+        domain: __prod__ ? "" : undefined,
       },
     })
   );

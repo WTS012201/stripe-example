@@ -39,9 +39,15 @@ export type LoginCredentials = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createSubscription: UserResponse;
   createUser: UserResponse;
   login: User;
   logout: Scalars['Boolean'];
+};
+
+
+export type MutationCreateSubscriptionArgs = {
+  source: Scalars['String'];
 };
 
 
@@ -64,6 +70,7 @@ export type User = {
   created_at: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['Int'];
+  type: Scalars['String'];
   updated_at: Scalars['DateTime'];
   username: Scalars['String'];
 };
@@ -76,28 +83,40 @@ export type UserResponse = Errors & {
 
 export type StandardErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type StandardUserFragment = { __typename?: 'User', id: number, username: string };
+export type StandardUserFragment = { __typename?: 'User', id: number, username: string, type: string };
 
-export type StandardUserResponseFragment = { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string } | null };
+export type StandardUserResponseFragment = { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, type: string } | null };
+
+export type CreateSubscriptionMutationVariables = Exact<{
+  source: Scalars['String'];
+}>;
+
+
+export type CreateSubscriptionMutation = { __typename?: 'Mutation', createSubscription: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, type: string } | null } };
 
 export type LoginMutationVariables = Exact<{
   credentials: LoginCredentials;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: number, username: string } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: number, username: string, type: string } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
   credentials: Credentials;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string } | null } };
+export type RegisterMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, type: string } | null } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string, type: string } | null };
 
 export const StandardErrorFragmentDoc = gql`
     fragment StandardError on FieldError {
@@ -109,6 +128,7 @@ export const StandardUserFragmentDoc = gql`
     fragment StandardUser on User {
   id
   username
+  type
 }
     `;
 export const StandardUserResponseFragmentDoc = gql`
@@ -122,6 +142,17 @@ export const StandardUserResponseFragmentDoc = gql`
 }
     ${StandardErrorFragmentDoc}
 ${StandardUserFragmentDoc}`;
+export const CreateSubscriptionDocument = gql`
+    mutation CreateSubscription($source: String!) {
+  createSubscription(source: $source) {
+    ...StandardUserResponse
+  }
+}
+    ${StandardUserResponseFragmentDoc}`;
+
+export function useCreateSubscriptionMutation() {
+  return Urql.useMutation<CreateSubscriptionMutation, CreateSubscriptionMutationVariables>(CreateSubscriptionDocument);
+};
 export const LoginDocument = gql`
     mutation Login($credentials: LoginCredentials!) {
   login(credentials: $credentials) {
@@ -132,6 +163,15 @@ export const LoginDocument = gql`
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterDocument = gql`
     mutation Register($credentials: Credentials!) {

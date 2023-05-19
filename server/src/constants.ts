@@ -21,3 +21,6 @@ export type Ctx = {
   res: Response;
   redisClient: Redis;
 };
+
+export const __prod__ = process.env.NODE_ENV === "production";
+export const SESSION_COOKIE = "SID";

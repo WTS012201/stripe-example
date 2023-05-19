@@ -23,9 +23,6 @@ export class User extends BaseEntity {
   @Column("text", { nullable: false })
   email: string;
 
-  @Column("text", { nullable: false })
-  password: string;
-
   @Field()
   @Column()
   @CreateDateColumn()
@@ -35,4 +32,14 @@ export class User extends BaseEntity {
   @Column()
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column("text", { nullable: false })
+  password: string;
+
+  @Column("text", { nullable: true })
+  stripeId?: string;
+
+  @Field()
+  @Column("text", { default: "free-trial" })
+  type: string;
 }
