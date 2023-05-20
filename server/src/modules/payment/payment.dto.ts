@@ -5,4 +5,5 @@ import { User } from "../user/user.model";
 export class PaymentSource {
   @Field() user!: User;
   @Field() source!: string;
+  @Field() last4!: string;
 }

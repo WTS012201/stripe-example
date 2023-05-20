@@ -1,18 +1,18 @@
-import { useCreateSubscriptionMutation } from "@/generated/graphql";
+import { useChangeCardMutation } from "@/generated/graphql";
 import React from "react";
 import StripeCheckout from "react-stripe-checkout";
 
-export const CheckoutButton = () => {
-  const [, subscibe] = useCreateSubscriptionMutation();
+export const ChangeCardButton = () => {
+  const [, changeCard] = useChangeCardMutation();
 
   return (
     <div className="sm:">
       <StripeCheckout
-        label="Subscribe"
+        label="Change Card"
         token={async (token) => {
-          const res = await subscibe({
-            last4: token.card.last4,
+          const res = await changeCard({
             source: token.id,
+            last4: token.card.last4,
           });
         }}
         stripeKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE!}
@@ -20,3 +20,5 @@ export const CheckoutButton = () => {
     </div>
   );
 };
+
+export default ChangeCardButton;

@@ -39,6 +39,8 @@ export type LoginCredentials = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelSubscription: UserResponse;
+  changeCard: UserResponse;
   createSubscription: UserResponse;
   createUser: UserResponse;
   login: User;
@@ -46,7 +48,14 @@ export type Mutation = {
 };
 
 
+export type MutationChangeCardArgs = {
+  last4: Scalars['String'];
+  source: Scalars['String'];
+};
+
+
 export type MutationCreateSubscriptionArgs = {
+  last4: Scalars['String'];
   source: Scalars['String'];
 };
 
@@ -70,6 +79,7 @@ export type User = {
   created_at: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['Int'];
+  last4?: Maybe<Scalars['String']>;
   type: Scalars['String'];
   updated_at: Scalars['DateTime'];
   username: Scalars['String'];
@@ -87,8 +97,22 @@ export type StandardUserFragment = { __typename?: 'User', id: number, username: 
 
 export type StandardUserResponseFragment = { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, type: string } | null };
 
+export type CancelSubscriptionMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CancelSubscriptionMutation = { __typename?: 'Mutation', cancelSubscription: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, type: string } | null } };
+
+export type ChangeCardMutationVariables = Exact<{
+  source: Scalars['String'];
+  last4: Scalars['String'];
+}>;
+
+
+export type ChangeCardMutation = { __typename?: 'Mutation', changeCard: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, type: string } | null } };
+
 export type CreateSubscriptionMutationVariables = Exact<{
   source: Scalars['String'];
+  last4: Scalars['String'];
 }>;
 
 
@@ -116,7 +140,7 @@ export type RegisterMutation = { __typename?: 'Mutation', createUser: { __typena
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string, type: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', last4?: string | null, id: number, username: string, type: string } | null };
 
 export const StandardErrorFragmentDoc = gql`
     fragment StandardError on FieldError {
@@ -142,9 +166,31 @@ export const StandardUserResponseFragmentDoc = gql`
 }
     ${StandardErrorFragmentDoc}
 ${StandardUserFragmentDoc}`;
+export const CancelSubscriptionDocument = gql`
+    mutation CancelSubscription {
+  cancelSubscription {
+    ...StandardUserResponse
+  }
+}
+    ${StandardUserResponseFragmentDoc}`;
+
+export function useCancelSubscriptionMutation() {
+  return Urql.useMutation<CancelSubscriptionMutation, CancelSubscriptionMutationVariables>(CancelSubscriptionDocument);
+};
+export const ChangeCardDocument = gql`
+    mutation ChangeCard($source: String!, $last4: String!) {
+  changeCard(source: $source, last4: $last4) {
+    ...StandardUserResponse
+  }
+}
+    ${StandardUserResponseFragmentDoc}`;
+
+export function useChangeCardMutation() {
+  return Urql.useMutation<ChangeCardMutation, ChangeCardMutationVariables>(ChangeCardDocument);
+};
 export const CreateSubscriptionDocument = gql`
-    mutation CreateSubscription($source: String!) {
-  createSubscription(source: $source) {
+    mutation CreateSubscription($source: String!, $last4: String!) {
+  createSubscription(source: $source, last4: $last4) {
     ...StandardUserResponse
   }
 }
@@ -187,6 +233,7 @@ export function useRegisterMutation() {
 export const MeDocument = gql`
     query Me {
   me {
+    last4
     ...StandardUser
   }
 }

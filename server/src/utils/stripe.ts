@@ -1,1 +1,5 @@
-export const stripe = require("stripe")(process.env.STRIPE_SECRET!);
+import Stripe from "stripe";
+
+export const stripe: Stripe = new Stripe(process.env.STRIPE_SECRET!, {
+  apiVersion: null,
+});

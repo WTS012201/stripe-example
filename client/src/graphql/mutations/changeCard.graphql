@@ -1,0 +1,5 @@
+mutation ChangeCard($source: String!, $last4: String!) {
+  changeCard(source: $source, last4: $last4) {
+    ...StandardUserResponse
+  }
+}

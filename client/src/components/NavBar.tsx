@@ -18,7 +18,7 @@ function classNames(...classes: any[]) {
 }
 
 const NavBar: React.FC<{}> = ({}) => {
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
+  const [, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(),
   });
@@ -26,11 +26,10 @@ const NavBar: React.FC<{}> = ({}) => {
   const [profile, setProfile] = React.useState(<></>);
 
   React.useEffect(() => {
-    console.log("effect");
+    console.log(data?.me);
     if (fetching) {
       //loading indicator
     } else if (!data?.me) {
-      //  logout will set me to null and go to else
       setProfile(
         <div>
           <NextLink href="/login" className="text-white mr-4">
@@ -73,14 +72,14 @@ const NavBar: React.FC<{}> = ({}) => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <Menu.Item>
                   {({ active }) => (
                     <NextLink
                       href="/account"
                       className={classNames(
                         active ? "bg-gray-100" : "",
-                        "block px-4 py-2 text-sm text-gray-700"
+                        "block px-4 py-2 text-sm text-gray-700 rounded-t-md"
                       )}
                     >
                       Your Profile
@@ -102,17 +101,20 @@ const NavBar: React.FC<{}> = ({}) => {
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <button
+                    <div
                       className={classNames(
                         active ? "bg-gray-100" : "",
-                        "block px-4 py-2 text-sm text-gray-700"
+                        "block px-4 py-2 text-sm text-gray-700 "
                       )}
-                      onClick={() => {
-                        logout({});
-                      }}
                     >
-                      Sign out
-                    </button>
+                      <button
+                        onClick={() => {
+                          logout({});
+                        }}
+                      >
+                        Sign out
+                      </button>
+                    </div>
                   )}
                 </Menu.Item>
               </Menu.Items>

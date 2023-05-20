@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import { useIsAuth } from "@/utils/useIsAuth";
+// import { useIsAuth } from "@/utils/useIsAuth";
 import { withUrqlClient } from "next-urql";
 import { urqlConfig } from "@/utils/urqlClient";
 import React from "react";
@@ -8,7 +8,7 @@ import NavBar from "@/components/NavBar";
 const inter = Inter({ subsets: ["latin"] });
 
 const Home: React.FC = () => {
-  useIsAuth();
+  // useIsAuth();
 
   return (
     <>

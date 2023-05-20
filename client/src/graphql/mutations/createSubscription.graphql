@@ -1,5 +1,5 @@
-mutation CreateSubscription($source: String!) {
-  createSubscription(source: $source) {
+mutation CreateSubscription($source: String!, $last4: String!) {
+  createSubscription(source: $source, last4: $last4) {
     ...StandardUserResponse
   }
 }

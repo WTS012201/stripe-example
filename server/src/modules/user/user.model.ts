@@ -36,10 +36,16 @@ export class User extends BaseEntity {
   @Column("text", { nullable: false })
   password: string;
 
+  // CARD
+
   @Column("text", { nullable: true })
   stripeId?: string;
 
-  @Field()
+  @Field(() => String)
   @Column("text", { default: "free-trial" })
   type: string;
+
+  @Field(() => String, { nullable: true })
+  @Column("text", { nullable: true })
+  last4?: string;
 }

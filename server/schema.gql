@@ -9,6 +9,7 @@ type User {
   created_at: DateTime!
   updated_at: DateTime!
   type: String!
+  last4: String
 }
 
 """
@@ -38,7 +39,9 @@ type Mutation {
   createUser(credentials: Credentials!): UserResponse!
   login(credentials: LoginCredentials!): User!
   logout: Boolean!
-  createSubscription(source: String!): UserResponse!
+  createSubscription(source: String!, last4: String!): UserResponse!
+  changeCard(source: String!, last4: String!): UserResponse!
+  cancelSubscription: UserResponse!
 }
 
 input Credentials {
