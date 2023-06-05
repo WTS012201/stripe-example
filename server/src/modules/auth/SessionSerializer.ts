@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { PassportSerializer } from "@nestjs/passport";
-import { User } from "../user.model";
-import { UserService } from "../user.service";
+import { User } from "../user/user.model";
+import { UserService } from "../user/user.service";
 
 // this attaches the user entity on req if authenticated
 @Injectable()

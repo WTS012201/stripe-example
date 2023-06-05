@@ -1,19 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { FieldError } from "src/constants";
 import { stripe } from "src/utils/stripe";
-import { UserResponse } from "../user/user.dto";
+import { UserResponse } from "../user/dto/user.response";
 import { User } from "../user/user.model";
-import { PaymentSource } from "./payment.dto";
+import { SourceArgs } from "./dto/source.args";
 
 @Injectable()
 export class PaymentService {
-  constructor() {}
-
   async createSubscription({
     user,
     source,
     last4,
-  }: PaymentSource): Promise<UserResponse> {
+  }: SourceArgs): Promise<UserResponse> {
     if (!user.stripeId) {
       const customer = await stripe.customers.create({
         email: user.email,
@@ -34,11 +32,7 @@ export class PaymentService {
     return { user };
   }
 
-  async changeCard({
-    user,
-    source,
-    last4,
-  }: PaymentSource): Promise<UserResponse> {
+  async changeCard({ user, source, last4 }: SourceArgs): Promise<UserResponse> {
     if (!user.stripeId || user.type !== "paid") {
       const error: FieldError = {
         message: "user has no card",

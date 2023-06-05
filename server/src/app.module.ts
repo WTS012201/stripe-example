@@ -5,9 +5,9 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "./modules/user/user.module";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { AuthModule } from "./modules/user/auth/auth.module";
 import { __prod__ } from "./constants";
 import { PaymentModule } from "./modules/payment/payment.module";
+import { AuthModule } from "./modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -15,6 +15,7 @@ import { PaymentModule } from "./modules/payment/payment.module";
       driver: ApolloDriver,
       autoSchemaFile: "schema.gql",
       context: ({ req, res }) => ({ req, res }),
+      includeStacktraceInErrorResponses: false,
     }),
     TypeOrmModule.forRoot({
       type: "postgres",

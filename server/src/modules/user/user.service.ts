@@ -1,10 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Credentials, LoginCredentials, UserResponse } from "./user.dto";
 import { User } from "./user.model";
 import * as argon2 from "argon2";
 import { FieldError } from "src/constants";
+import { RegisterArgs } from "./dto/register.args";
+import { UserResponse } from "./dto/user.response";
+import { LoginArgs } from "../auth/dto/login.args";
+import { GraphQLError } from "graphql";
 
 @Injectable()
 export class UserService {
@@ -13,7 +16,7 @@ export class UserService {
     private readonly userRep: Repository<User>
   ) {}
 
-  async create(data: Credentials): Promise<UserResponse> {
+  async create(data: RegisterArgs): Promise<UserResponse> {
     data.password = await argon2.hash(data.password);
     let createdUser = this.userRep.create(data);
 
@@ -25,7 +28,13 @@ export class UserService {
           message: "username taken",
           field: "username",
         };
-        return { errors: [error] };
+
+        throw new GraphQLError("invalid input", {
+          extensions: {
+            code: "FIELD_ERROR",
+            fieldErrors: [error],
+          },
+        });
       }
     }
 
@@ -35,9 +44,9 @@ export class UserService {
   async loginByUsername({
     username,
     password,
-  }: LoginCredentials): Promise<User | null> {
+  }: LoginArgs): Promise<User | null> {
     const user = await this.userRep.findOneBy({
-      username: username,
+      username,
     });
     if (!user) {
       return null;
