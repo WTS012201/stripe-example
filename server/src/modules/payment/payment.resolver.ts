@@ -2,48 +2,37 @@ import { Inject, UseGuards } from "@nestjs/common";
 import { Args, Context, Mutation, Resolver } from "@nestjs/graphql";
 import { Ctx } from "src/constants";
 import { UserAuthGuard } from "../auth/auth.guard";
-import { UserResponse } from "../user/dto/user.response";
+import { User } from "../user/user.model";
+import { PaymentInput } from "./dto/payment.input";
 import { PaymentService } from "./payment.service";
 
 @Resolver()
 export class PaymentResolver {
   constructor(@Inject(PaymentService) private paymentService: PaymentService) {}
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => User)
   @UseGuards(UserAuthGuard)
   async createSubscription(
-    @Args("source", { type: () => String }) source: string,
-    @Args("last4", { type: () => String }) last4: string,
+    @Args("source") source: PaymentInput,
     @Context() { req }: Ctx
-  ): Promise<UserResponse> {
-    const res = await this.paymentService.createSubscription({
-      user: req.user,
-      source,
-      last4,
-    });
-
+  ): Promise<User> {
+    const res = await this.paymentService.createSubscription(source, req.user);
     return res;
   }
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => User)
   @UseGuards(UserAuthGuard)
   async changeCard(
-    @Args("source", { type: () => String }) source: string,
-    @Args("last4", { type: () => String }) last4: string,
+    @Args("source") source: PaymentInput,
     @Context() { req }: Ctx
-  ): Promise<UserResponse> {
-    const res = await this.paymentService.changeCard({
-      user: req.user,
-      source,
-      last4,
-    });
-
+  ): Promise<User> {
+    const res = await this.paymentService.changeCard(source, req.user);
     return res;
   }
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => User)
   @UseGuards(UserAuthGuard)
-  async cancelSubscription(@Context() { req }: Ctx): Promise<UserResponse> {
+  async cancelSubscription(@Context() { req }: Ctx): Promise<User> {
     const res = await this.paymentService.cancelSubscription(req.user);
     return res;
   }

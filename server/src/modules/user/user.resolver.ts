@@ -10,20 +10,15 @@ import {
 import { Inject } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Ctx } from "src/constants";
-import { UserResponse } from "./dto/user.response";
-import { RegisterArgs } from "./dto/register.args";
+import { RegisterInput } from "./dto/register.input";
 
 @Resolver(() => User)
 export class UserResolver {
   constructor(@Inject(UserService) private userService: UserService) {}
 
-  @Mutation(() => UserResponse)
-  async register(
-    @Args("register") register: RegisterArgs,
-    @Context() { req }: Ctx
-  ): Promise<UserResponse> {
+  @Mutation(() => User)
+  async register(@Args("register") register: RegisterInput): Promise<User> {
     const res = await this.userService.create(register);
-    if (!res.errors) req.user = res.user;
     return res;
   }
 

@@ -2,11 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type FieldError {
-  field: String!
-  message: String!
-}
-
 type User {
   id: Int!
   username: String!
@@ -22,35 +17,31 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type UserResponse implements Errors {
-  errors: [FieldError!]
-  user: User
-}
-
-interface Errors {
-  errors: [FieldError!]
-}
-
 type Query {
   me: User
 }
 
 type Mutation {
-  register(register: RegisterArgs!): UserResponse!
-  createSubscription(source: String!, last4: String!): UserResponse!
-  changeCard(source: String!, last4: String!): UserResponse!
-  cancelSubscription: UserResponse!
+  register(register: RegisterInput!): User!
+  createSubscription(source: PaymentInput!): User!
+  changeCard(source: PaymentInput!): User!
+  cancelSubscription: User!
   logout: Boolean!
-  login(credentials: LoginArgs!): User!
+  login(credentials: LoginInput!): User!
 }
 
-input RegisterArgs {
+input RegisterInput {
   username: String!
   password: String!
   email: String!
 }
 
-input LoginArgs {
+input PaymentInput {
+  source: String!
+  last4: String!
+}
+
+input LoginInput {
   username: String!
   password: String!
 }

@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Ctx, SESSION_COOKIE } from "src/constants";
 import { User } from "../user/user.model";
 import { GqlAuthGuard, LocalAuthGuard } from "./auth.guard";
-import { LoginArgs } from "./dto/login.args";
+import { LoginInput } from "./dto/login.input";
 
 @Resolver()
 export class AuthResolver {
@@ -25,7 +25,7 @@ export class AuthResolver {
   @Mutation(() => User)
   @UseGuards(GqlAuthGuard, LocalAuthGuard)
   async login(
-    @Args("credentials") _: LoginArgs,
+    @Args("credentials") _: LoginInput,
     @Context() { req }: Ctx
   ): Promise<User> {
     return req.user;

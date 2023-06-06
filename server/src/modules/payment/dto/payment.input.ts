@@ -1,9 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { User } from "src/modules/user/user.model";
 
 @InputType()
-export class SourceArgs {
-  @Field() user!: User;
+export class PaymentInput {
   @Field() source!: string;
   @Field() last4!: string;
 }

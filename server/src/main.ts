@@ -9,6 +9,7 @@ import { createClient } from "redis";
 import { Logger, ValidationError, ValidationPipe } from "@nestjs/common";
 import { SESSION_COOKIE, __prod__ } from "./constants";
 import { GraphQLError } from "graphql";
+import ClassValidatorPipe from "./utils/ClassValidatorPipe";
 
 const main = async () => {
   const app = await NestFactory.create(AppModule, {
@@ -46,27 +47,12 @@ const main = async () => {
   app.use(passport.initialize());
   app.use(passport.session());
   app.useGlobalPipes(
-    new ValidationPipe({
-      exceptionFactory: (errors: ValidationError[]) => {
-        const fieldErrors = errors.map((error: ValidationError) => {
-          let message = Object.values(error.constraints).reduce(
-            (prev, curr) => curr + prev,
-            ""
-          );
-          return { field: error.property, message };
-        });
-
-        throw new GraphQLError("invalid input", {
-          extensions: {
-            code: "FIELD_ERROR",
-            fieldErrors,
-          },
-        });
-      },
+    new ClassValidatorPipe({
       forbidUnknownValues: false,
       whitelist: true,
     })
   );
+
   await app.listen(4000);
 };
 

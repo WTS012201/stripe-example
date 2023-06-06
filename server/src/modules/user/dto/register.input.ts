@@ -24,7 +24,7 @@ const passwordMessage = (args: ValidationArguments): string => {
 };
 
 @InputType()
-export class RegisterArgs {
+export class RegisterInput {
   @Length(3, 16)
   @Field()
   username!: string;

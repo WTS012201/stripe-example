@@ -1,49 +1,29 @@
 import {
-  ArgumentMetadata,
-  HttpException,
-  HttpStatus,
   Injectable,
+  ValidationError,
   ValidationPipe,
   ValidationPipeOptions,
 } from "@nestjs/common";
-import { plainToInstance } from "class-transformer";
-import { ValidationError } from "class-validator";
+import { FieldError } from "src/constants";
 
 @Injectable()
 export default class ClassValidatorPipe extends ValidationPipe {
-  constructor(options: ValidationPipeOptions | undefined) {
-    super(options);
-  }
-  async transform(value: any, metaData: ArgumentMetadata): Promise<any> {
-    const { metatype }: any = metaData;
+  constructor(options?: ValidationPipeOptions) {
+    super({
+      ...options,
+      exceptionFactory: (errors: ValidationError[]) => {
+        const fieldErrors = errors.map((error: ValidationError) => {
+          const message = Object.values(error.constraints).reduce(
+            (prev, curr) => curr + prev,
+            ""
+          );
+          return { field: error.property, message };
+        });
 
-    console.log(JSON.stringify(metatype));
-    const object = plainToInstance(metatype, value);
-    let errors: ValidationError[];
-
-    try {
-      errors = await this.validate(object);
-    } catch (err) {
-      return value;
-    }
-
-    if (errors && errors.length > 0) {
-      throw new HttpException(
-        { errors: this.mapErrors(errors) },
-        HttpStatus.OK
-      );
-    }
-
-    return value;
-  }
-
-  private mapErrors(errors: ValidationError[]) {
-    return errors.map((error: ValidationError) => {
-      let message = "";
-      for (let key in error.constraints) {
-        message += error.constraints[key];
-      }
-      return { field: error.property, message };
+        throw new FieldError(...fieldErrors);
+      },
+      forbidUnknownValues: false,
+      whitelist: true,
     });
   }
 }
